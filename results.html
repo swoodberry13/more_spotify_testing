@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User's Top Artists</title>
+</head>
+<body>
+    <h1>User's Top Artists</h1>
+    <ul id="topArtistsList"></ul>
+
+    <script>
+        // Function to extract code from URL after redirection
+        function getCodeFromUrl() {
+            var urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('code');
+        }
+
+        // Once the page loads, extract the code from URL and fetch user's top artists
+        window.onload = async function() {
+            var code = getCodeFromUrl();
+            if (code) {
+                try {
+                    // Exchange code for access token
+                    var response = await fetch('/exchange_code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 'code': code })
+                    });
+                    var data = await response.json();
+                    var accessToken = data.access_token;
+
+                    // Fetch user's top artists using the access token
+                    var topArtistsResponse = await fetch('https://api.spotify.com/v1/me/top/artists', {
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken
+                        }
+                    });
+                    var topArtistsData = await topArtistsResponse.json();
+
+                    // Display user's top artists on the page
+                    var topArtistsList = document.getElementById('topArtistsList');
+                    topArtistsData.items.forEach(function(artist) {
+                        var listItem = document.createElement('li');
+                        listItem.textContent = artist.name;
+                        topArtistsList.appendChild(listItem);
+                    });
+                } catch (error) {
+                    console.error('Error fetching top artists:', error);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
