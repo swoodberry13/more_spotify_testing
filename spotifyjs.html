@@ -8,12 +8,14 @@
 
   <script>
     var client_id = 'daeea42af07e4702905904f246591317';
-    var redirect_uri = 'https://swoodberry13.github.io/more_spotify_testing/results.html';
-    var scopes = 'user-top-read';
+    var redirect_uri = 'https://sloanw.sgedu.site/spotify/results.html';
+    var scopes = 'user-top-read playlist-read-private user-read-recently-played';
             document.getElementById('loginButton').addEventListener('click', function() {
-            var authUrl = 'https://accounts.spotify.com/authorize?client_id=' + client_id +
-                          '&response_type=code&redirect_uri=' + encodeURIComponent(redirect_uri) +
-                          '&scope=' + encodeURIComponent(scopes);
+            var authUrl = 'https://accounts.spotify.com/authorize?response_type=token&client_id='
+             + client_id + '&scope=' + encodeURIComponent(scopes)+'&redirect_uri=' + encodeURIComponent(redirect_uri);
+                          // var authUrl = 'https://accounts.spotify.com/authorize?client_id=' + client_id +
+                          // '&response_type=code&redirect_uri=' + encodeURIComponent(redirect_uri) +
+                          // '&scope=' + encodeURIComponent(scopes);
             window.location.href = authUrl;
         });
 
@@ -22,13 +24,19 @@
             var urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('code');
         }
+        function getAccessTokenFromURL(){
+          var urlParams = new URLSearchParams(window.location.search);
+         
+          return  urlParams.get('access_token');
+        }
 
         // Once the page loads, extract the code from URL and redirect to results.html
         window.onload = function() {
             var code = getCodeFromUrl();
+            var code2 = getAccessTokenFromURL()
             if (code) {
                 // Redirect to results.html with the code as a query parameter
-                window.location.href = 'results.html?code=' + encodeURIComponent(code);
+                window.location.href = 'results.html?access_token='+encodeURIComponent(code2);
             }
         };
 
